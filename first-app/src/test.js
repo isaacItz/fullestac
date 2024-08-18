@@ -32,7 +32,11 @@ console.log(primero, segundo, resto)
 const obj = {
     name: 'bob',
     age: 20,
-    city: 'London'
+    city: 'London', 
+    bye: function () {
+        console.log('Adiós!')
+    },
+    doAddition: function(a, b) {    console.log(a + b)  },
 }
 // les podemos agregar propiedades despues de declararlos
 obj.email = 'bob@example.com'
@@ -43,6 +47,33 @@ console.log(obj)
 const square = x => x*x
 console.log(square(4))
 
+obj.greet = function () {
+    console.log(`Hola, mi nombre es ${this.name}`)
+}
 
+obj.bye()
+obj.greet()
 
+const saludar = obj.greet.bind(obj)
+saludar()
+
+setTimeout(obj.greet.bind(obj),  1000)
+
+// classes
+
+class Person {
+  constructor(name, age) {
+    this.name = name
+    this.age = age
+  }
+  greet() {
+    console.log('hello, my name is ' + this.name)
+  }
+}
+
+const adam = new Person('Adam Ondra', 29)
+adam.greet()
+
+const janja = new Person('Janja Garnbret', 23)
+janja.greet()
 
