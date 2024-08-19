@@ -3,29 +3,39 @@ import { useState } from 'react'
 let average = 0
 let positivePercentage = 0
 
+const Table = ({rows}) => {
+  console.log(rows)
+  console.log()
+  return (
+    <table>
+      <tbody>
+        <tr>
+        </tr>
+        {rows.map(row => (
+          <tr key={row[0]}>
+            <td>{row[0]}</td>
+            <td>{row[1]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
 const Button = ({ onClick, text }) => {
   return (
     <button onClick={onClick}>{text}</button>
   )
 }
 
-const StatisticLine = ({ text, value}) => {
-  return (
-    <p>{text}: {value}</p>
-  )
-}
 const Statistics = ({ good, bad, neutral, all, average, positivePercentage }) => {
   if (all === 0)
     return <p>No feedback given</p>
+
+  const rows = [['good', good], ['bad', bad], ['neutral', neutral], ['all', all], ['average', average], ['positivePercentage', positivePercentage]]
   return (
     <>
       <h2>Statistics</h2>
-      <StatisticLine text={"good"} value={good}></StatisticLine>
-      <StatisticLine text={"neutral"} value={neutral}> </StatisticLine>
-      <StatisticLine text={"bad"} value={bad}></StatisticLine>
-      <StatisticLine text={"all"} value={all}></StatisticLine>
-      <StatisticLine text={"average"} value={average}></StatisticLine>
-      <StatisticLine text={"positive"} value={positivePercentage} ></StatisticLine>
+      <Table rows={rows}/>
     </>
   )
 }
