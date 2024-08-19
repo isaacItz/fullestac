@@ -1,5 +1,30 @@
 import { useState } from 'react'
 
+const MostVoted = ({ anecdotes, votes }) => {
+  console.log('votes', votes)
+  const calcMostVoted = () => {
+    let max = 0
+    Object.values(votes).forEach(vote => { if (vote > max) max = vote })
+
+
+    let mostVoted = []
+    Object.keys(votes).forEach(i => votes[i] === max && mostVoted.push(i))
+
+    return mostVoted
+  }
+
+  const mostVoted = calcMostVoted()
+  console.log('most voted', mostVoted)
+
+  return (
+    <>
+      <h2>Most voted anecdote{mostVoted.length > 1 && 's'}</h2>
+      {Object.values(mostVoted).map(vote => <p key={vote}>{anecdotes[vote]}</p>)}
+    </>
+  )
+
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -19,7 +44,7 @@ const App = () => {
     setSelected(Math.floor(Math.random() * anecdotes.length))
   }
   const handleVote = () => {
-    const newVotes = {...votes}
+    const newVotes = { ...votes }
     newVotes[selected] = (newVotes[selected] || 0) + 1
     setVotes(newVotes)
     console.log(typeof votes)
@@ -32,6 +57,7 @@ const App = () => {
       <p>votes: {votes[selected]}</p>
       <button onClick={handleVote} >vote</button>
       <button onClick={handleRandomAnecdote} >random anecdote</button>
+      <MostVoted anecdotes={anecdotes} votes={votes} />
     </div>
   )
 }
