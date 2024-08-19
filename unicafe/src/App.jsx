@@ -4,10 +4,11 @@ let average = 0
 let positivePercentage = 0
 
 const Statistics = ({ good, bad, neutral, all, average, positivePercentage }) => {
-
+  if (all === 0)
+    return <p>No feedback given</p>
   return (
     <>
-      <h2>Reviews</h2>
+      <h2>Statistics</h2>
       <p>good: {good}</p>
       <p>neutral: {neutral}</p>
       <p>bad: {bad}</p>
@@ -62,8 +63,6 @@ const App = () => {
       <button onClick={onNeutral} > neutral</button>
       <button onClick={onBad} > bad</button>
       <Statistics good={good} bad={bad} neutral={neutral} all={all} average={average} positivePercentage={positivePercentage} />
-      <div>
-      </div>
     </>
   )
 }
