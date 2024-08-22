@@ -1,26 +1,29 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
 
-import App from './App'
+import App from "./App";
 
 const notes = [
   {
     id: 1,
-    content: 'HTML is easy',
-    important: true
+    content: "HTML is easy",
+    important: true,
   },
   {
     id: 2,
-    content: 'Browser can execute only JavaScript',
-    important: false
+    content: "Browser can execute only JavaScript",
+    important: false,
   },
   {
     id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    important: true
-  }
-]
+    content: "GET and POST are the most important methods of HTTP protocol",
+    important: true,
+  },
+];
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <App notes={notes} />
-)
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App notes={notes} />
+  </StrictMode>
+);
