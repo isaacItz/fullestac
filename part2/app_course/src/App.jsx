@@ -14,7 +14,13 @@ const App = (props) => {
     noteService.getAll().then((data) => {
       setNotes(data);
       console.log("effect completed");
-    });
+    }).catch((err) => {
+      console.error("Error fetching notes:", err);
+      setErrorMessage("Failed to fetch notes from server");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    })
   }, []);
 
   const toggleImportanceOf = (id) => {
