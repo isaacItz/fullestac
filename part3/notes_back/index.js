@@ -3,6 +3,7 @@ const cors = require("cors");
 let notes = require("./notes.json");
 
 const app = express();
+app.use(express.static('dist'))
 app.use(express.json());
 
 const requestLogger = (request, response, next) => {
@@ -73,13 +74,13 @@ app.post("/api/v1/notes", (req, res) => {
 
 app.put("/api/v1/notes/:id", (req, res) => {
   const id = Number(req.params.id);
-  const note = notes.find( n => n.id === id)
+  const note = notes.find(n => n.id === id)
 
   if (!note) return res.status(404).end()
 
   const body = req.body
-  const newNote = {...note, ...body}
-  notes = notes.map( note => note.id !== id ? note : newNote)
+  const newNote = { ...note, ...body }
+  notes = notes.map(note => note.id !== id ? note : newNote)
   res.status(200).json(newNote)
 })
 app.delete("/api/v1/notes/:id", (req, res) => {
