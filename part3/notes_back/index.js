@@ -30,7 +30,7 @@ const CORSmiddleware = (req, res, next) => {
 };
 // app.use(CORSmiddleware)
 const corsOptions = {
-  origin: "http://localhost:5173"
+  origin: ["http://localhost:5173", "https://notes-api-kip5.onrender.com/"]
 }
 app.use(cors(corsOptions));
 app.get("/", (req, res) => {
