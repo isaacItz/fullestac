@@ -3,7 +3,7 @@ import Phonebook from "@src/components/PhoneBook";
 import AddContactForm from "@src/components/AddContactForm";
 import Filter from "@src/components/Filter";
 import Notification from "@src/components/Notification";
-import axios from "axios";
+import personsService from "@src/services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -15,10 +15,11 @@ const App = () => {
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(null);
   const hook = () => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => {
-        setPersons(response.data);
+    personsService
+      .getAll()
+      .then((contacts) => {
+        console.log("holra", JSON.stringify(contacts));
+        setPersons(contacts);
       })
       .catch((err) => {
         console.erros(`Error getting persons ${err.message}}, err`);
@@ -36,7 +37,12 @@ const App = () => {
         setPersons={setPersons}
         setNotification={setNotification}
       />
-      <Phonebook persons={persons} setPersons={setPersons} filter={filter} setNotification={setNotification} />
+      <Phonebook
+        persons={persons}
+        setPersons={setPersons}
+        filter={filter}
+        setNotification={setNotification}
+      />
     </div>
   );
 };
