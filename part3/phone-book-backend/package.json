@@ -6,6 +6,7 @@
   "scripts": {
     "build-ui": "rm -r dist/ && cd ../../part2/phone-book/ && pnpm build && cp -r dist/ ../../part3/phone-book-backend/",
     "deploy": "git status && git add . && git commit -m 'deploy' && git push",
+    "deploy:full": "pnpm run build-ui && pnpm run deploy",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

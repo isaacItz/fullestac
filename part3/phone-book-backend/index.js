@@ -84,6 +84,38 @@ app.delete(`${baseUrl}/persons/:id`, (req, res) => {
 
   res.status(202).send();
 });
+
+app.patch(`${baseUrl}/persons/:id`, (req, res) => {
+  const id = Number(req.params.id)
+  const contact = contacts.find(c => c.id === id)
+  if (!contact) return res.status(404).send({ message: "Contact not found" })
+
+  if (!(contact.name || contact.number)) return res.status(400).json({ message: "at least one field is needes (name, number)" })
+
+  const partial = req.body
+  console.log(partial)
+  const newContact = { ...contact, ...partial }
+  contacts = contacts.map(c => c.id !== id ? c : newContact)
+  res.status(202).json(newContact)
+
+})
+
+app.put(`${baseUrl}/persons/:id`, (req, res) => {
+  const id = Number(req.params.id);
+  const person = contacts.find((contact) => contact.id === id);
+  if (!person) return res.status(404).json({ message: "Contact not found" });
+
+  const body = req.body;
+  if (!(body.name && body.number)) return res.status(400).json({ message: "name or number missing" });
+
+  let existing = contacts.find((c) => c.name == body.name && c.id !== person.id);
+  if (existing) return res.status(400).json({ message: "Contact name must be unique" });
+
+  existing = contacts.find((c) => c.number == body.number && c.id !== person.id);
+  if (existing) return res.status(400).json({ message: "Contact number must be unique" });
+
+  person.name
+})
 app.get("/info", (req, res) => {
   const people = contacts.length;
   const now = new Date();

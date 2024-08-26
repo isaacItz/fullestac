@@ -12,7 +12,15 @@ Content-Type: application/json
 ################################
 DELETE http://localhost:3001/api/v1/persons/1
 ################################
-PUT http://localhost:3001/api/v1/personas/8003
+PATCH http://localhost:3001/api/v1/persons/1
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "number": 388233434849183
+}
+################################
+PUT http://localhost:3001/api/v1/persons/8003
 Content-Type: application/json
 
 {
