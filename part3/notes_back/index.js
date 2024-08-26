@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 let notes = require("./notes.json");
 
 const app = express();
@@ -7,12 +8,30 @@ app.use(express.json());
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
   console.log("Path:  ", request.path);
+  console.log("headers:", request.headers);
   console.log("Body:  ", request.body);
   console.log("---");
   next();
 };
 app.use(requestLogger);
 
+const CORSmiddleware = (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+};
+// app.use(CORSmiddleware)
+const corsOptions = {
+  origin: "http://localhost:5173"
+}
+app.use(cors(corsOptions));
 app.get("/", (req, res) => {
   res.send("<h1>Welcome</h1>");
 });
@@ -52,6 +71,17 @@ app.post("/api/v1/notes", (req, res) => {
   res.status(201).json(newNote);
 });
 
+app.put("/api/v1/notes/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const note = notes.find( n => n.id === id)
+
+  if (!note) return res.status(404).end()
+
+  const body = req.body
+  const newNote = {...note, ...body}
+  notes = notes.map( note => note.id !== id ? note : newNote)
+  res.status(200).json(newNote)
+})
 app.delete("/api/v1/notes/:id", (req, res) => {
   const id = Number(req.params.id);
   const len = notes.length;
@@ -70,7 +100,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

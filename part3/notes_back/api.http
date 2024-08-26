@@ -14,3 +14,11 @@ Content-Type: application/json
   "title": "New Note",
   "content": "This is a new note."
 }
+################################
+PUT http://localhost:3001/api/v1/notes/1
+Content-Type: application/json
+
+{
+  "important": false,
+  "content": "This is an updated note."
+}
