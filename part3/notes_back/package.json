@@ -7,6 +7,7 @@
     "dev": "nodemon index.js",
     "build-ui": "rm -r dist && cd ../../part2/app_course/ && pnpm run build && cp -r dist/ ../../part3/notes_back/",
     "deploy": "git add . && git status && git commit -m 'uibuild' && git push",
+    "deploy:full": "pnpm run build-ui && pnpm run deploy",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
