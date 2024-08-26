@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors")
 const morgan = require("morgan");
 let contacts = require("./persons.json");
 
@@ -6,6 +7,8 @@ const baseUrl = "/api/v1";
 const app = express();
 const PORT = 3001;
 
+app.use(express.static('dist'))
+app.use(cors())
 const middleware = (req, res, next) => {
   res.set("name", "isaac");
   next();
@@ -18,7 +21,7 @@ morgan.token('body', body)
 app.use(express.json());
 app.use(middleware);
 app.use(
-  morgan(function (tokens, req, res) {
+  morgan(function(tokens, req, res) {
     return [
       tokens.method(req, res),
       tokens.url(req, res),
