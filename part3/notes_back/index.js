@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require("express");
 const cors = require("cors");
+const Note = require("./models/notes.js")
 let notes = require("./notes.json");
 
 const app = express();
@@ -40,7 +42,9 @@ app.get("/api/v1/notes", (req, res) => {
   console.log(req.headers);
   console.log(req.ip);
   console.log(req.get("host"));
-  res.json(notes);
+  Note.find({}).then(notes => {
+    res.json(notes)
+  });
 });
 app.get("/api/v1/notes/:id", (req, res) => {
   const id = Number(req.params.id);
