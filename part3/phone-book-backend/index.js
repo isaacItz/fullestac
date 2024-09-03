@@ -1,7 +1,9 @@
+require("dotenv").config()
 const express = require("express");
 const cors = require("cors")
 const morgan = require("morgan");
 let contacts = require("./persons.json");
+const Contact = require("./models/contacts")
 
 const baseUrl = "/api/v1";
 const app = express();
@@ -34,70 +36,87 @@ app.use(
     ].join(" ");
   })
 );
-app.get(`${baseUrl}/persons`, (req, res) => {
-  res.json(contacts);
+app.get(`${baseUrl}/persons`, (req, res, next) => {
+  Contact.find({}).then(contacts => {
+    res.json(contacts);
+  }).catch(err => {
+    next(err)
+  })
 });
 
-app.get(`${baseUrl}/persons/:id`, (req, res) => {
-  const id = Number(req.params.id);
-  const person = contacts.find((contact) => contact.id === id);
-
-  if (!person) {
-    res.status(404).json({ error: "Contact not found" });
-  } else {
-    res.json(person);
-  }
+app.get(`${baseUrl}/persons/:id`, (req, res, next) => {
+  Contact.findById(req.params.id).then(contact => {
+    if (!contact)
+      return res.status(404).json({ error: "Contact not found" });
+    res.json(contact)
+  }).catch(err => {
+    next(err)
+  })
 });
-const generateId = () => {
-  return Math.ceil(Math.random() * 10000);
-};
-app.post(`${baseUrl}/persons`, (req, res) => {
-  const body = req.body;
+
+app.post(`${baseUrl}/persons`, async (req, res, next) => {
+  const { name, number } = req.body
   let message = { message: "name or number missing" };
-  if (!(body.name && body.number)) return res.status(400).send(message);
+  if (!name || !number) return res.status(400).send(message);
 
-  let existing = contacts.find((c) => {
-    return c.name == body.name;
-  });
-  message.message = "Contact name must be unique";
-  if (existing) return res.status(400).send(message);
+  try {
+    // we are doing two queries, one to get name and the other to get the number
+    const existingName = await Contact.findOne({ name: name })
+    console.log(existingName)
+    if (existingName)
+      return res.status(400).json({ message: "Name must be unique" })
 
-  existing = contacts.find((c) => c.number == body.number);
-  message.message = "Contact number must be unique";
-  if (existing) return res.status(400).send(message);
+    const existingNumber = await Contact.findOne({ number: number })
+    if (existingNumber)
+      return res.status(400).json({ message: "Number must be unique" })
 
-  const newContact = {
-    id: generateId(),
-    name: body.name,
-    number: body.number,
-  };
+    const newContact = new Contact({
+      name: name,
+      number: number
+    })
+    newContact.save().then(
+      contact => {
+        res.status(201).json(contact)
+      }
+    )
 
-  contacts.push(newContact);
-  res.status(201).json(newContact);
-});
-app.delete(`${baseUrl}/persons/:id`, (req, res) => {
-  const id = Number(req.params.id);
-  const person = contacts.find((contact) => contact.id === id);
-  if (!person) return res.status(404).json({ message: "Contact not found" });
+  } catch (err) {
+    next(err)
+  }
 
-  contacts = contacts.filter((contact) => contact.id !== person.id);
-
-  res.status(202).send();
 });
 
-app.patch(`${baseUrl}/persons/:id`, (req, res) => {
-  const id = Number(req.params.id)
-  const contact = contacts.find(c => c.id === id)
-  if (!contact) return res.status(404).send({ message: "Contact not found" })
+app.delete(`${baseUrl}/persons/:id`, (req, res, next) => {
+  Contact.findByIdAndDelete(req.params.id).then(contact => {
+    if (!contact)
+      return res.status(404).json({ message: "id not found" })
+    res.status(200).json(contact)
+  }).catch(err => next(err))
+});
 
-  if (!(contact.name || contact.number)) return res.status(400).json({ message: "at least one field is needes (name, number)" })
+app.patch(`${baseUrl}/persons/:id`, async (req, res, next) => {
+  // here we are doing everithing on one query and then we look in the result array if there's any field with repeadet number or name 
+  try {
+    const contact = await Contact.findById(req.params.id)
+    if (!contact)
+      return res.status(404).json({ message: "Contact not found" })
 
-  const partial = req.body
-  console.log(partial)
-  const newContact = { ...contact, ...partial }
-  contacts = contacts.map(c => c.id !== id ? c : newContact)
-  res.status(202).json(newContact)
+    // looking for duplicates
+    const contacts = await Contact.find({ $or: [{ name: req.body.name }, { number: req.body.number }] })
+    let nameExists = contacts.some(c => c.name.toString() === req.body && c._id.toString() !== req.params.id)
+    let numberExists = contacts.some(c => c.number.toString() == req.body.number && c._id.toString() !== req.params.id)
+    console.log(`exists: ${nameExists}, num: ${numberExists}`)
 
+    if (nameExists) return res.status(409).json({ message: "Name already exists" })
+    if (numberExists) return res.status(409).json({ message: "Number already exists" })
+
+    const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true })
+
+    res.status(202).json(updatedContact)
+
+  } catch (err) {
+    next(err)
+  }
 })
 
 app.put(`${baseUrl}/persons/:id`, (req, res) => {
@@ -116,8 +135,8 @@ app.put(`${baseUrl}/persons/:id`, (req, res) => {
 
   person.name
 })
-app.get("/info", (req, res) => {
-  const people = contacts.length;
+app.get("/info", async (req, res) => {
+  const people = await Contact.countDocuments({})
   const now = new Date();
   const date = now.toString();
   const content = `
@@ -130,8 +149,16 @@ app.get("/info", (req, res) => {
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
-
 app.use(unknownEndpoint);
+
+const handleErrors = (err, req, res, next) => {
+  console.log(err)
+  if (err.name === "CastError")
+    return res.status(400).json({ message: "malformed id" })
+
+  next(err)
+}
+app.use(handleErrors)
 
 app.listen(PORT, () => {
   console.log(`app listening on port ${PORT}`);
