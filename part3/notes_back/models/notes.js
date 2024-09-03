@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-
 // DO NOT SAVE YOUR PASSWORD TO GITHUB!!
 const url = process.env.MONGODB_URI
 
@@ -15,8 +14,13 @@ db.on('disconnected', () => {
 })
 
 const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
+  content: {
+    type: String,
+    required: true,
+    minlength: 5,
+    maxlength: 1000
+  },
+  important: Boolean
 })
 
 noteSchema.set('toJSON', {

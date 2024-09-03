@@ -1,10 +1,10 @@
 GET http://localhost:3001/api/v1/notes
 
 ################################
-DELETE http://localhost:3001/api/v1/notes/1
+DELETE http://localhost:3001/api/v1/notes/66cf3f0f06600be36fab7212
 
 ################################
-GET http://localhost:3001/api/v1/notes/1
+GET http://localhost:3001/api/v1/notes/66ce14a6abbb81633caef8ac
 
 ################################
 POST http://localhost:3001/api/v1/notes
@@ -12,13 +12,13 @@ Content-Type: application/json
 
 {
   "title": "New Note",
-  "content": "This is a new note."
+  "content": "pasa"
 }
 ################################
-PUT http://localhost:3001/api/v1/notes/1
+PUT http://localhost:3001/api/v1/notes/66cf3f1706600be36fab7220
 Content-Type: application/json
 
 {
   "important": false,
-  "content": "This is an updated note."
+  "content": "que pasa tio"
 }
