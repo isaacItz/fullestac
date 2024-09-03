@@ -1,13 +1,13 @@
 import { useState } from "react";
 import personService from "@src/services/persons";
 
-const AddContactForm = ({ persons, setPersons, setNotification}) => {
+const AddContactForm = ({ persons, setPersons, setNotification }) => {
   const [newName, setNewName] = useState("");
   const [number, setNumber] = useState(0);
 
   const addContact = (event) => {
     event.preventDefault();
-    const  coincidences = persons.filter((person) => person.name === newName || person.number === number);
+    const coincidences = persons.filter((person) => person.name === newName || person.number === number);
     console.log("existe agregar", coincidences.length);
     let person = coincidences.find((person) => person.name === newName);
     if (person?.name === newName) {
@@ -17,6 +17,8 @@ const AddContactForm = ({ persons, setPersons, setNotification}) => {
         personService.partialUpdate(person.id, updatedNumber).then((person) => {
           console.log("partially updated person: ", person);
           setPersons(persons.map((p) => (p.id !== person.id ? p : person)));
+        }).catch(err => {
+          console.log(`error at updating the existing contact ${err}`)
         });
       }
       return;
@@ -30,8 +32,8 @@ const AddContactForm = ({ persons, setPersons, setNotification}) => {
     const newPerson = { name: newName, number: number };
     personService.create(newPerson).then((person) => {
       console.log("person added to the api: ", person);
-      setNotification( {type: "success", message: `${person.name} was added to the phonebook`})
-      setTimeout( () => {
+      setNotification({ type: "success", message: `${person.name} was added to the phonebook` })
+      setTimeout(() => {
         setNotification(null)
       }, 5000);
       setPersons(persons.concat(person));
